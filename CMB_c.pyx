@@ -45,7 +45,7 @@ class CMB(object):
         self.OM_c2 = OM_c2
         self.OM_g2 = OM_g2
         self.OM_L2 = OM_L2
-        self.OM_nu2 = (7./8) * (4./11.)**(4./3) * Neff * OM_g2
+        self.OM_nu2 = 0.
 
         self.OM_M = self.OM_b + self.OM_c + (self.OM_c2 + self.OM_b2) * Nbrane
         self.OM_R = self.OM_g  + self.OM_nu + (self.OM_g2 + self.OM_nu2) * Nbrane
@@ -53,7 +53,7 @@ class CMB(object):
 
         self.Nbrane = Nbrane
         if OM_b2 != 0.:
-            self.PressFac = (OM_g2 / OM_b2) / (OM_g / OM_b2)
+            self.PressFac = (OM_g2 / OM_b2) / (OM_g / OM_b)
         else:
             self.PressFac = 0.
 
@@ -69,8 +69,8 @@ class CMB(object):
         else:
             self.f_tag = ''
 
-        self.cparam_tag = '_Ob_{:.4e}_Oc_{:.4e}_H0_{:.4e}_Neff_{:.4e}_Ns_{:.4e}_As_{:.4e}_zreion_{:.2f}_'.format(self.OM_b, self.OM_c,
-                    HubbleParam, Neff, n_s_index, A_s_norm, self.z_reion)
+        self.cparam_tag = '_Ob_{:.4e}_Oc_{:.4e}_H0_{:.4e}_Neff_{:.4e}_Ns_{:.4e}_As_{:.4e}_zreion_{:.2f}_'.format(self.OM_b,
+                        self.OM_c, HubbleParam, Neff, n_s_index, A_s_norm, self.z_reion)
 
         self.lmax = lmax
         self.lvals = lvals
@@ -180,6 +180,7 @@ class CMB(object):
             self.scale_to_ct = lambda x: ManyUni.scale_to_ct(x)
             if tau:
                 ManyUni.tau_functions()
+
             self.eta0 = ManyUni.eta_0
             self.H_0 = ManyUni.H_0
         opt_depthL = np.loadtxt(path + '/precomputed/working_expOpticalDepth' + self.f_tag + '.dat')

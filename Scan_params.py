@@ -4,7 +4,7 @@ import sys
 import fileinput
 
 
-rangeList = [(0.01, 0.07), (0.2, 0.32), (60., 80.), (-9.5, -7.5), (0.93, 1.), (6., 18.)]
+rangeList = [(0.01, 0.07), (0.2, 0.32), (60., 80.), (-9.5, -7.5), (0.93, 1.), (6., 18.), (0., -10)]
 
 Ob_L = [0.04]
 Oc_L = [0.26]
@@ -14,9 +14,13 @@ As_L = [3e-9]
 Ns_L = [0.96]
 z_reL = [10]
 
+Nbranes = 1e0
+log10PressF = [-6]
+extraCDM = 0.00
+
 def generate_samples(N=1000):
-    range_list = np.zeros(6)
-    min_list = np.zeros(6)
+    range_list = np.zeros(7)
+    min_list = np.zeros(7)
     for i in range(len(rangeList)):
         range_list[i] = rangeList[i][1] - rangeList[i][0]
         min_list[i] = rangeList[i][0]
@@ -36,7 +40,7 @@ sample_list = generate_samples()
 
 for sample in sample_list:
     nef = 3.045
-    ob, oc, h0, Ass, ns, zre = sample
+    ob, oc, h0, Ass, ns, zre, lnPr = sample
     As = 10.**Ass
     print('Computing: ', ob, oc, h0, nef, Ass, ns, zre)
     replaceAll(launch_file,"z_reion =", "z_reion = {:.2f} \n".format(zre))
@@ -46,6 +50,10 @@ for sample in sample_list:
     replaceAll(launch_file,"n_s_index =", "n_s_index = {:.4f} \n".format(ns))
     replaceAll(launch_file,"Neff =", "Neff = {:.4f} \n".format(nef))
     replaceAll(launch_file,"A_s_norm =", "A_s_norm = {:.4e} \n".format(As))
+    
+    replaceAll(launch_file,"extraCDM =", "extraCDM = {:.4e} \n".format(extraCDM))
+    replaceAll(launch_file,"PressureFac =", "PressureFac = {:.4e} \n".format(np.power(10., lnPr)))
+    replaceAll(launch_file,"Nbranes =", "Nbranes = {:.4e} \n".format(Nbranes))
                         
     os.system("python " + launch_file)
 

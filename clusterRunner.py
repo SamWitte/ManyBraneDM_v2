@@ -9,7 +9,7 @@ t_0 = time.time()
 
 Multiverse = True
 Nbranes = 1e0
-PressureFac = 1e-6
+PressureFac = 1e-4
 extraCDM = 0.000
 
 HubbleParam = 67.66
@@ -43,7 +43,7 @@ else:
     OM_g = 5.43e-5
     OM_L = 0.
 
-    if extraCDM == 0:
+    if (extraCDM==0):
         OM_b2 =  omega_cdm / Nbranes
         OM_c2 = 0.
         OM_g2 = PressureFac * (OM_g / OM_b) * OM_b2

@@ -1069,7 +1069,7 @@ class ManyBrane_Universe(object):
             fhe = 0.16381 / 2.
             nbry = self.n_bary
         else:
-            tg =self.darkCMB_T * (1. + 10.**lgz) * kboltz
+            tg = self.darkCMB_T * (1. + 10.**lgz) * kboltz
             fhe = self.yp_prime / (4. * (1. - self.yp_prime))
             nbry = self.n_bary_D
 

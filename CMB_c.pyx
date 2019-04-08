@@ -66,11 +66,13 @@ class CMB(object):
         self.Ftag = Ftag
         if multiverse:
             self.f_tag = '_Nbranes_{:.0e}_PressFac_{:.2e}_eCDM_{:.2e}'.format(self.Nbrane, self.PressFac, self.eCDM)
+            omCDM_tag = Nbrane * OM_b2 + self.eCDM
+            self.cparam_tag = '_Ob_{:.4e}_Oc_{:.4e}_H0_{:.4e}_Neff_{:.4e}'.format(self.OM_b, omCDM_tag, HubbleParam, Neff)
+            self.cparam_tag += '_Ns_{:.4e}_As_{:.4e}_zreion_{:.2f}_'.format(n_s_index, A_s_norm, self.z_reion)
         else:
             self.f_tag = ''
-
-        self.cparam_tag = '_Ob_{:.4e}_Oc_{:.4e}_H0_{:.4e}_Neff_{:.4e}_Ns_{:.4e}_As_{:.4e}_zreion_{:.2f}_'.format(self.OM_b,
-                        self.OM_c, HubbleParam, Neff, n_s_index, A_s_norm, self.z_reion)
+            self.cparam_tag = '_Ob_{:.4e}_Oc_{:.4e}_H0_{:.4e}_Neff_{:.4e}'.format(self.OM_b,self.OM_c, HubbleParam, Neff)
+            self.cparam_tag += '_Ns_{:.4e}_As_{:.4e}_zreion_{:.2f}_'.format(n_s_index, A_s_norm, self.z_reion)
 
         self.lmax = lmax
         self.lvals = lvals
@@ -218,7 +220,7 @@ class CMB(object):
             else:
                 ManyUni = ManyBrane_Universe(self.Nbrane, k, [self.OM_b, self.OM_b2], [self.OM_c, self.OM_c2],
                                           [self.OM_g, self.OM_g2], [self.OM_L, self.OM_L2],
-                                          [self.OM_nu, self.OM_nu2], accuracy=1e-2,
+                                          [self.OM_nu, self.OM_nu2], accuracy=1e-3,
                                           stepsize=stepsize, lmax=self.lmax_Pert, hubble_c=self.HubbleParam, zreion=self.z_reion)
                 soln = ManyUni.solve_system(compute_TH)
 

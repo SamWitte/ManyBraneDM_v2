@@ -20,7 +20,7 @@ path = os.getcwd()
 import warnings
 #warnings.simplefilter("ignore", Warning)
 
-def accuarcy_plot(LCDM=True):
+def accuarcy_plot(LCDM=True, Nbranes=1, eCDM=0):
 
     
     fig = plt.figure(figsize=(8., 6.))
@@ -29,11 +29,17 @@ def accuarcy_plot(LCDM=True):
         figname = 'plots/Accuracy_plot_LCDM_TT_.pdf'
         dataF = 'Data/LCDM_TT_Cls.dat'
         n_input = 6
+        metaF = 'MetaGraphs/LCDM_TT_Cls/LCDM_TT_Cls_Graph_Global_'
+    else:
+        figname = 'plots/Accuracy_plot_MultiB_TT_Nbr_{:.1e}_Ecdm_{:.3e}.pdf'.format(Nbranes, eCDM)
+        dataF = 'Data/MultiB_Nbr_{:.1e}_Ecdm_{:.3e}_TT_Cls.dat'.format(Nbranes, eCDM)
+        n_input = 6
+        metaF = 'MetaGraphs/MultiB_TT_Nbranes_{:.0f}_eCDM_{:.0f}_'.format(Nbranes, eCDM) + '/MultiB_TT_CLs_Graph_'
+
     dataL = np.loadtxt(dataF)
     inputs = dataL[:,:n_input]
     outputs = np.power(10, dataL[:, n_input:])
 
-    metaF = 'MetaGraphs/LCDM_TT_Cls/LCDM_TT_Cls_Graph_Global_'
     NNet = ImportGraph(metaF, dataF)
     predict = np.power(10, NNet.run_yhat(inputs))
     

@@ -3,4 +3,6 @@ import os
 
 path = os.getcwd()
 
-accuarcy_plot(LCDM=True)
+Nbrane = 1
+ecdm = 0
+accuarcy_plot(LCDM=False, Nbranes=Nbrane, eCDM=ecdm)

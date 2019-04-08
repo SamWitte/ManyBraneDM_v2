@@ -33,8 +33,8 @@ filePTS = 'mcmc_pts/MCMC_pts_'+arrayName + tag + '_.dat'
 scterPlt = 'mcmc_pts/MCMC_PLT_'+arrayName + tag + '_.pdf'
 cornerPLT = 'mcmc_pts/Corner_'+arrayName + tag + '_.pdf'
 
-params_low = [0.01, 0.2, 60., -9.5, 0.93, 6.]
-params_space = [0.06, 0.12, 20, 2, 0.07, 12]
+params_low = [-10, 0.01, 0.2, 60., -9.5, 0.93, 6.]
+params_space = [10, 0.06, 0.12, 20, 2, 0.07, 12]
 
 nnet = MLP_Nnet(HiddenNodes=Nhidden, LCDM=LCDM)
 nnet.main_nnet()

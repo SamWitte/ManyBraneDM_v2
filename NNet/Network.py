@@ -11,35 +11,38 @@ RANDOM_SEED = 42
 tf.set_random_seed(RANDOM_SEED)
 
 class MLP_Nnet(object):
-    def __init__(self, HiddenNodes=25, epochs=10000, LCDM=True):
+    def __init__(self, HiddenNodes=25, epochs=10000, LCDM=True, Nbranes=1, eCDM=0):
         tf.reset_default_graph()
         self.N_EPOCHS = epochs
         self.h_size = HiddenNodes
         self.LCDM = LCDM
+        self.Nbranes = Nbranes
+        self.eCDM = eCDM
         self.grad_stepsize = 1e-3
         if LCDM:
             self.dirName = 'MetaGraphs/LCDM_TT_Cls'
             self.fileN = self.dirName + '/LCDM_TT_Cls_Graph_Global_'
         else:
             # Fix this
-            self.dirName = 'MetaGraphs/ALPHA_Tb_Global'
-            self.fileN = self.dirName + '/ALPHA_21cm_Graph_Global_'
+            self.dirName = 'MetaGraphs/MultiB_TT_Nbranes_{:.0f}_eCDM_{:.0f}_'.format(Nbranes, eCDM)
+            self.fileN = self.dirName + '/MultiB_TT_CLs_Graph_'
         
         if not os.path.exists(self.dirName):
             os.mkdir(self.dirName)
     
     def init_weights(self, shape):
         """ Weight initialization """
-        weights = tf.random_normal(shape, stddev=0.4)
+        weights = tf.random_normal(shape, stddev=0.1)
         return tf.Variable(weights)
 
-    def forwardprop(self, X, w_1, w_2, w_3):
+    def forwardprop(self, X, w_1, w_2, w_3, w_4):
         """
         Forward-propagation.
         """
         hid1 = tf.nn.sigmoid(tf.matmul(X, w_1))
         hid2 = tf.nn.sigmoid(tf.matmul(hid1, w_2))
-        yhat = tf.matmul(hid2, w_3)
+        hid3 = tf.nn.sigmoid(tf.matmul(hid2, w_3))
+        yhat = tf.matmul(hid2, w_4)
         return yhat
 
     def get_data(self, frac_test=0.3):
@@ -48,6 +51,9 @@ class MLP_Nnet(object):
         if self.LCDM:
             fileNd = 'Data/LCDM_TT_Cls.dat'
             inputN = 6
+        else:
+            fileNd = 'Data/MultiB_Nbr_{:.1e}_Ecdm_{:.3e}_TT_Cls.dat'.format(self.Nbranes, self.eCDM)
+            inputN = 7
 
         dataVals = np.loadtxt(fileNd)
         np.random.shuffle(dataVals)
@@ -79,18 +85,19 @@ class MLP_Nnet(object):
         # Weight initializations
         self.w_1 = self.init_weights((self.x_size, self.h_size))
         self.w_2 = self.init_weights((self.h_size, self.h_size))
-        self.w_3 = self.init_weights((self.h_size, self.y_size))
+        self.w_3 = self.init_weights((self.h_size, self.h_size))
+        self.w_4 = self.init_weights((self.h_size, self.y_size))
 
         # Forward propagation
-        self.yhat = self.forwardprop(self.X, self.w_1, self.w_2, self.w_3)
+        self.yhat = self.forwardprop(self.X, self.w_1, self.w_2, self.w_3, self.w_4)
         
         tf.add_to_collection("activation", self.yhat)
         # Backward propagation
         
-        self.cost = tf.reduce_sum(tf.square((self.y - self.yhat), name="cost"))
+        self.cost = tf.reduce_sum(tf.square((10.**self.y - 10.**self.yhat), name="cost"))
         # Error Check
-        self.perr_train = tf.reduce_sum(tf.abs((self.y - self.yhat) / self.y))
-        self.perr_test = tf.reduce_sum(tf.abs((self.y - self.yhat) / self.y))
+        self.perr_train = tf.reduce_sum(tf.abs((10.**self.y - 10.**self.yhat)))
+        self.perr_test = tf.reduce_sum(tf.abs((10.**self.y - 10.**self.yhat)))
         self.updates = tf.train.GradientDescentOptimizer(self.grad_stepsize).minimize(self.cost)
         
         self.saveNN = tf.train.Saver()
@@ -98,12 +105,13 @@ class MLP_Nnet(object):
         return
 
     def train_NN(self, evalVec, keep_training=False):
+        break_cnt = 0
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
             if keep_training:
                 self.saveNN.restore(sess, self.fileN)
                 print 'Model Restored.'
-            BATCH_SIZE = 20
+            BATCH_SIZE = 30
             train_count = len(self.train_X)
             for i in range(1, self.N_EPOCHS + 1):
                 for start, end in zip(range(0, train_count, BATCH_SIZE),
@@ -123,9 +131,12 @@ class MLP_Nnet(object):
                         hold_train = train_accuracy/len(self.train_X)
                         hold_test = test_accuracy/len(self.test_X)
                     else:
-                        if (hold_train - train_accuracy/len(self.train_X)) < 1e-3:
+                        if (hold_train - train_accuracy/len(self.train_X)) < 1e-3 and (hold_train - train_accuracy/len(self.train_X)) > 0:
+                            print 'Decreasing Step Size...'
                             self.grad_stepsize / 2.
                         if (hold_test - test_accuracy/len(self.test_X)) < 0.:
+                            break_cnt += 1
+                        if break_cnt > 1e6:
                             print 'Potential Overtraining, breaking loop...'
                             break
                         if self.grad_stepsize < 1e-9:
@@ -178,6 +189,8 @@ class ImportGraph():
         dataIN = np.loadtxt(dataFile)
         if LCDM:
             n_in = 6
+        else:
+            n_in = 7
         input_v = dataIN[:, :n_in]
         std_input_v = self.scalar.fit_transform(input_v)
         return

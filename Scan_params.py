@@ -56,6 +56,9 @@ for sample in sample_list:
     replaceAll(launch_file,"Nbranes =", "Nbranes = {:.4e} \n".format(Nbranes))
                         
     os.system("python " + launch_file)
-    os.remove('precomputed/*.dat')
+    try:
+        os.remove('precomputed/*.dat')
+    except FileNotFoundError:
+        continue
     
 print('Done.')

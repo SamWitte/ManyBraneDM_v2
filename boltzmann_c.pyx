@@ -992,6 +992,9 @@ class ManyBrane_Universe(object):
             he2_tab_inc = 10.**interp1d(np.log10(he2_tab[:,0]), np.log10(he2_tab[:,1]),
                             fill_value=-100., bounds_error=False, kind='cubic')(np.log10(avals))
             XeN = np.vstack((he_xe_tab, np.column_stack((avals, val_sln[:,0] + he2_tab_inc))))
+            if np.any(XeN < 1e-6) or np.any(XeN > 1.5):
+                print('Xe Calculation Failed!!! Breaking.')
+                raise ValueError
 
             tvals2 = np.linspace(1e4, 1e-2, 10000)
             termpB = odeint(self.recast_Tb, 2.7255 * (1. + tvals2[0]), tvals2,

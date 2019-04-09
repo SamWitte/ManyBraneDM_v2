@@ -9,19 +9,17 @@ t_0 = time.time()
 
 Multiverse = True
 Nbranes = 1e0
-PressureFac = 1e-4
+PressureFac = 6.79e-5
 extraCDM = 0.000
 
-HubbleParam = 67.66
-n_s_index = 0.9619
-A_s_norm = 2.215e-9
+HubbleParam = 68.098
+n_s_index = 0.9869
+A_s_norm = 2.6593e-9 # 2.215e-9
 Neff = 3.046
-z_reion = 10.
-Om_b_load = 0.0492
-Om_c_load = 0.266
+z_reion = 13.42
+Om_b_load = 0.07 # 0.0492
+Om_c_load = 0.266 #0.266
 
-# Modify rho_c
-rho_critical *= (HubbleParam / 100.)**2.
 
 if not Multiverse:
     Ftag = 'StandardUniverse'
